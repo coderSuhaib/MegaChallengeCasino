@@ -14,8 +14,17 @@ namespace MegaChallengeCasino
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if(!Page.IsPostBack)
+            {
+                string[] reels = new string[] { spinReel(), spinReel(), spinReel() };
+                displayImages(reels);
+                ViewState.Add("TotalMoney", 100);
+                displayTotalMoney(); 
 
+            }
         }
+
+        
 
         protected void leverBtn_Click(object sender, EventArgs e)
         {
@@ -23,9 +32,19 @@ namespace MegaChallengeCasino
             if (!int.TryParse(betTextBox.Text, out bet)) return;
             int winnings = imagesValue(bet);
             displayResult(bet, winnings);
+            calculateTotalMoney(bet, winnings);
+            displayTotalMoney();
+
         }
 
-        
+        private void calculateTotalMoney(int bet, int winnings)
+        {
+            int totalMoney = int.Parse(ViewState["TotalMoney"].ToString());
+            totalMoney -= bet;
+            totalMoney += winnings;
+            ViewState["TotalMoney"] = totalMoney;
+        }
+
         private int imagesValue(int bet)
         {
             string[] reelValue = new string[] {spinReel(), spinReel(), spinReel()};
@@ -131,6 +150,12 @@ namespace MegaChallengeCasino
             {
                 resultLabel.Text = string.Format("Sorry, you lost {0:C}. Better luck next time.", bet);
             }
+        }
+
+        // This method is to display the total money that the players has by pulling the value from ViewState. 
+        private void displayTotalMoney()
+        {
+            moneyLabel.Text = string.Format("Player's Money: {0:C}", ViewState["TotalMoney"]);
         }
 
     }
